@@ -1,0 +1,40 @@
+.login-page {
+    justify-content: center;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.login-form-container {
+    width: 520px;
+    padding: 48px;
+    box-shadow: 0px 0px 21px;
+    background: white;
+}
+
+.form-label {
+    width: 100%;
+    display: block;
+}
+
+.form-control {
+    width: 95%;
+    height: 40px;
+    display: block;
+    padding: 6px 12px;
+}
+
+.submit-btn {
+    width: 120px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.mb-2 {
+    margin-bottom: 16px;
+}
+
+.error-feedback {
+    color: red;
+    margin-top: 8px;
+}

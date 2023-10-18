@@ -1,0 +1,9 @@
+.logoarea {
+        top: 1%;
+    border-width: 1 1 1px;
+    background-color: #f2f2f2;
+    position: fixed;
+    left: 1%;            
+    background: #fff;
+    height: 114px;
+}
