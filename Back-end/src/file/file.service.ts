@@ -10,6 +10,9 @@ import { decryptData } from 'src/utils/decryption';
 import { ec } from 'elliptic';
 import { findIvAndKey } from 'src/utils/ivandkey';
 const ethec = new ec('secp256k1');
+const fs = require('fs');
+const path = require('path');
+import * as http from 'http';
 
 @Injectable()
 export class FileService {
@@ -42,9 +45,9 @@ export class FileService {
           iv,
           key,
         ).toString('base64'),
-        mimeType: encryptField(Buffer.from(file.mimetype), iv, key).toString(
-          'base64',
-        ),
+        mimeType: encryptField(
+          Buffer.from(file.mimetype.toString()), iv, key
+          ).toString('base64'),
         fileSize: encryptField(
           Buffer.from(file.size.toString()),
           iv,
@@ -56,6 +59,7 @@ export class FileService {
           key,
         ).toString('base64'),
       });
+      console.log(file);
 
       // Save the document
       await newFile.save();
@@ -100,6 +104,7 @@ export class FileService {
       });
       notiFication = 'Successful';
     }
+     console.log(file.buffer);
 
     return { notiFication };
   }
@@ -118,10 +123,10 @@ export class FileService {
       originalname: file.originalName,
       encoding: '7bit',
       mimetype: file.mimeType,
-      fileSize: file.fileSize,
-      buffer: Buffer.from(file.fileBuffer, 'base64'), // Convert Base64 string back to Buffer
+      size: file.fileSize,
+      buffer: Buffer.from(file.fileBuffer), // Convert Base64 string back to Buffer
     };
-
+    console.log(fileObject.buffer);
     return fileObject;
   }
 
@@ -148,13 +153,63 @@ export class FileService {
       mimetype: decryptData(encryptFile.mimeType, iv, key),
       size: decryptData(encryptFile.fileSize, iv, key),
       buffer: Buffer.from(
-        decryptData(encryptFile.fileBuffer, iv, key),
-        'base64',
+        decryptData(encryptFile.fileBuffer, iv, key)
       ),
     };
+    console.log(fileObject.buffer);
+    await this.createFileFromBuffer(fileObject.originalname, fileObject.buffer)
 
     return fileObject;
   }
+
+  // CREATE FILE FROM BUFFER
+  async createFileFromBuffer(originalname: string, buffer: Buffer) {
+
+  
+    const fileName = originalname;
+    const filePath = path.join(__dirname,'files',fileName);
+    
+    
+    try {
+      // Tạo file với tên là originalname
+      const dir = path.dirname(filePath);
+
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, {recursive: true});
+      }
+
+      fs.writeFileSync(filePath, buffer);
+      await this.downloadFile(filePath, fileName);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async downloadFile(filePath: any, fileName: string) {
+    return new Promise<void>((resolve, reject) => {
+  
+      const server = http.createServer((req, res) => {
+        res.writeHead(200, {
+          'Content-Type': 'application/octet-stream', 
+          'Content-Disposition': `attachment; filename=${fileName}`  
+        });
+  
+        fs.createReadStream(filePath)
+          .pipe(res)
+          .on('end', () => {
+            server.close();
+            resolve();
+          });
+  
+      });
+  
+      server.listen(3001, () => {
+        console.log('File downloading...');
+      });
+  
+    });
+  }
+  
 
   // DELETE
 

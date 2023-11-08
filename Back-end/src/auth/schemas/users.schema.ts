@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import {Document } from 'mongoose';
 
 export class iKeySecret {
   X: string[];
@@ -8,13 +8,13 @@ export class iKeySecret {
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ type: mongoose.Schema.Types.String })
+  @Prop({ type: String })
   name: string;
 
   @Prop({ unique: [true, 'Duplicate email entered'] })
   email: string;
 
-  @Prop({ type: mongoose.Schema.Types.String })
+  @Prop({ type: String })
   password: string;
 
   @Prop({
@@ -22,17 +22,18 @@ export class User {
   })
   keySecret: iKeySecret;
 
-  @Prop({ type: mongoose.Schema.Types.String })
-  dateOfBirth: string;
+  @Prop({type: String})
+  dateOfBirth: String;
 
-  @Prop({ type: mongoose.Schema.Types.String })
+  @Prop()
   phoneNumber: string;
 
   @Prop({ type: Object })
   files: string;
 
-  @Prop({ type: mongoose.Schema.Types.String })
+  @Prop({ type: String })
   gender: string;
 }
-export type UserDocument = HydratedDocument<User>;
+
+export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);

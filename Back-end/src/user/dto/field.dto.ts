@@ -7,7 +7,7 @@ export class FieldDto {
   readonly email: string;
   //field
   @IsNotEmpty()
-  readonly field: string[];
+  readonly field: any[];
   //password
   @IsNotEmpty()
   @IsString()

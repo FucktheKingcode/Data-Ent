@@ -17,6 +17,7 @@ export class File {
 
   @Prop({ required: true })
   fileBuffer: string;
+  
 }
 
 export type FileDocument = File & Document;

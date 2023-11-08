@@ -1,5 +1,5 @@
 import { createCipheriv, randomBytes } from 'crypto';
-import { User, iKeySecret } from 'src/auth/schemas/users.schema';
+import { User, UserDocument, iKeySecret } from 'src/auth/schemas/users.schema';
 import { curve, ec } from 'elliptic';
 import { hash } from 'bcrypt';
 import { BN } from 'bn.js';
@@ -73,16 +73,17 @@ export function encryptField(
 
 // Mã hóa trường field trong User object
 export async function encryptUserObjectWithOptions(
-  tempObject: User,
+  tempObject: UserDocument,
   password: string,
-  fieldsToEncrypt: string[], // Danh sách trường cần mã hóa
-): Promise<User> {
+  fieldsToEncrypt: any[], // Danh sách trường cần mã hóa
+): Promise<UserDocument> {
   const keyEC = ethec.keyFromPrivate(password);
   const { iv, key } = await findIvAndKey(tempObject, keyEC);
+  
   await Promise.all(
     fieldsToEncrypt.map(async (field) => {
       if (tempObject[field]) {
-        const fieldBuffer = Buffer.from(tempObject[field]);
+        const fieldBuffer = Buffer.from(tempObject[field].toString('base64'));
         const encryptedField = encryptField(fieldBuffer, iv, key);
 
         // Lưu trường đã mã hóa
